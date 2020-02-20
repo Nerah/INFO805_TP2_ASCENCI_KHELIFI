@@ -221,39 +221,32 @@ namespace rt {
             return result;
         }
 
-        /// Calcule l'illumination de l'objet \a obj au point \a p, sachant que l'observateur est le rayon \a ray.
-        Color illumination( const Ray& ray, GraphicalObject* obj, Point3 p ){
+        Color illumination(const Ray& ray, GraphicalObject* obj, Point3 p){
             Material m = obj->getMaterial(p);
             Color final = Color(0,0,0);
-            for(std::vector<Light*>::const_iterator it = this->ptrScene->myLights.begin() , itE=this->ptrScene->myLights.end();it!=itE;it++){
 
-                Vector3 lightDirection = (*it)->direction(p);
-                Color lightColor= (*it)->color(p);
-                Ray pointToLight = Ray(p,lightDirection);
-                Color colorShadow = this->shadow(pointToLight,lightColor);
+            for(auto it : ptrScene->myLights) {
+                Vector3 lDir = it->direction(p);
+                Color lColor = it->color(p);
+                Ray pointToLight = Ray(p, lDir);
+                Color colorShadow = shadow(pointToLight, lColor);
 
-
-                // cosinus de l'angle entre lightDirection et la normale au point p
                 Vector3 normalP = obj->getNormal(p);
                 Vector3 w = RayUtils::reflect(ray.direction, normalP);
 
-                Real cosb = w.dot(lightDirection)/( lightDirection.norm() * w.norm() );
-                if(cosb < 0 ) {cosb = 0;} // (cosb = 0.0 si négatif)
-                Real coeffSpec = std::pow(cosb,m.shinyness);
+                Real cosb = w.dot(lDir) / (lDir.norm() * w.norm());
+                if(cosb < 0) cosb = 0;
+                Real coeffSpec = std::pow(cosb, m.shinyness);
 
-                Real coeffDiff = normalP.dot(lightDirection) /( lightDirection.norm() * normalP.norm() );
-                if(coeffDiff < 0 ) {coeffDiff = 0;} // (coeffDiff = 0.0 si négatif)*
+                Real coeffDiff = normalP.dot(lDir) / (lDir.norm() * normalP.norm());
+                if(coeffDiff < 0) coeffDiff = 0;
 
-                final += (*it)->color(p) * m.specular * coeffSpec;
-                final += (*it)->color(p) * m.diffuse * coeffDiff;
-
+                final += it->color(p) * m.specular * coeffSpec;
+                final += it->color(p) * m.diffuse * coeffDiff;
                 final = final * colorShadow;
-
             }
             final += m.ambient;
-            //std::cout << "red : " << final.r() << std::endl;
             return final;
-
         }
 
         /// Affiche les sources de lumières avant d'appeler la fonction qui
