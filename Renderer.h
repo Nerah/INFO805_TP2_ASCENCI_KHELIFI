@@ -9,8 +9,12 @@
 #include "Color.h"
 #include "Image2D.h"
 #include "Ray.h"
+#include "Utils.h"
 #include <random>
 #include <iostream>
+
+// constants
+#define EPSILON 0.001f
 
 /// Namespace RayTracer
 namespace rt {
@@ -165,13 +169,13 @@ namespace rt {
                     for(int i = 0 ; i<antialiasing ; i++) {
                         Real    progress   = (Real) y / (Real)(myHeight-1);
 
-                        Real    ty   = ((Real) y + randFloat(0.0, 1.0))/ (Real)(myHeight-1);
+                        Real    ty   = ((Real) y + MathUtils::randFloat(0.0, 1.0))/ (Real)(myHeight-1);
                         progressBar( std::cout, progress, 1.0 );
                         Vector3 dirL = (1.0f - ty) * myDirUL + ty * myDirLL;
                         Vector3 dirR = (1.0f - ty) * myDirUR + ty * myDirLR;
                         dirL        /= dirL.norm();
                         dirR        /= dirR.norm();
-                        Real    tx   = ((Real) x + randFloat(0.0, 1.0)) / (Real)(myWidth-1);
+                        Real    tx   = ((Real) x + MathUtils::randFloat(0.0, 1.0)) / (Real)(myWidth-1);
                         Vector3 dir  = ((1.0f - tx) * dirL) + (tx * dirR);
                         Ray eye_ray  = Ray( myOrigin, dir, max_depth );
                         result = result + trace( eye_ray );
@@ -182,11 +186,6 @@ namespace rt {
             }
             std::cout << "Done." << std::endl;
         }
-
-        float randFloat(float a, float b){
-            return ((b - a ) * ((float) rand() / RAND_MAX)) + a;
-        }
-
 
         /// The rendering routine for one ray.
         /// @return the color for the given ray.
@@ -200,39 +199,27 @@ namespace rt {
             // Look for intersection in this direction.
             Real ri = ptrScene->rayIntersection( ray, obj_i, p_i );
             // Nothing was intersected
-            //if ( ri >= 0.0f ) return Color( 0.0, 0.0, 0.0 ); // some background color
-            if ( ri >= 0.0f ) return this->background(ray); // some background color
+            if (ri >= 0.0f) return this->background(ray);
 
             Material m = obj_i->getMaterial(p_i);
 
-            if(ray.depth > 0 && m.coef_reflexion !=0){
-                Vector3 rayReflect = reflect(ray.direction,obj_i->getNormal(p_i));
-                Ray newRay = Ray(p_i + rayReflect * 0.001f,rayReflect,ray.depth -1);
-                Color c_refl = trace(newRay);
-                result += c_refl * m.specular * m.coef_reflexion;
-
+            if(ray.depth > 0 && m.coef_reflexion != 0) {
+                Vector3 rRefl = RayUtils::reflect(ray.direction, obj_i->getNormal(p_i));
+                Ray newRay = Ray(p_i + rRefl * EPSILON, rRefl, ray.depth - 1);
+                Color cRefl = trace(newRay);
+                result += cRefl * m.specular * m.coef_reflexion;
+            }
+            if(ray.depth > 0 && m.coef_refraction != 0) {
+                Ray newRay = refractionRay(ray,p_i,obj_i->getNormal(p_i), m);
+                Color cRefrac = trace(newRay);
+                result += cRefrac * m.diffuse * m.coef_refraction;
             }
 
-            if(ray.depth > 0 && m.coef_refraction !=0){
-                Ray newRay = refractionRay(ray,p_i,obj_i->getNormal(p_i),m);
-                Color c_refrac = trace(newRay);
-                result += c_refrac * m.diffuse * m.coef_refraction;
-
-            }
-            ///  Il faut multiplier le résultat de l'illumination
-            /// par le coefficient de diffusion du matériau sauf si on est arrivé à la profondeur 0.
-            Color tmp = illumination(ray,obj_i,p_i);
-            if(ray.depth !=0)
-                tmp = tmp * obj_i->getMaterial(p_i).coef_diffusion;
+            Color tmp = illumination(ray, obj_i, p_i);
+            if(ray.depth != 0) tmp = tmp * obj_i->getMaterial(p_i).coef_diffusion;
             result += tmp;
             return result;
         }
-        /// Calcule le vecteur réfléchi à W selon la normale N.
-        Vector3 reflect( const Vector3& W, Vector3 N ) const {
-            return W - 2 * W.dot(N) * N;
-        }
-
-
 
         /// Calcule l'illumination de l'objet \a obj au point \a p, sachant que l'observateur est le rayon \a ray.
         Color illumination( const Ray& ray, GraphicalObject* obj, Point3 p ){
@@ -248,7 +235,7 @@ namespace rt {
 
                 // cosinus de l'angle entre lightDirection et la normale au point p
                 Vector3 normalP = obj->getNormal(p);
-                Vector3 w = reflect(ray.direction,normalP);
+                Vector3 w = RayUtils::reflect(ray.direction, normalP);
 
                 Real cosb = w.dot(lightDirection)/( lightDirection.norm() * w.norm() );
                 if(cosb < 0 ) {cosb = 0;} // (cosb = 0.0 si négatif)
@@ -298,7 +285,7 @@ namespace rt {
             Point3           p_i;       // point of intersection
             Point3 newP =  ray.origin;
             while(light_color.max() > 0.003f){
-                newP =  newP + ray.direction * 0.01f; // on decale le point p;
+                newP =  newP + ray.direction * EPSILON; // on decale le point p;
                 // Look for intersection in this direction.
                 Ray newRay = Ray(newP,ray.direction,ray.depth);
                 Real ri = ptrScene->rayIntersection( newRay, obj_i, p_i );
@@ -332,10 +319,10 @@ namespace rt {
 
             //Total reflexion
             if( 1 - ( (r*r) * (1 - (c*c) )) < 0) {
-                vRefrac = reflect(aRay.direction,N);
+                vRefrac = RayUtils::reflect(aRay.direction, N);
             }
 
-            Ray newRay = Ray(p + vRefrac * 0.01f,vRefrac,aRay.depth -1);
+            Ray newRay = Ray(p + vRefrac * EPSILON,vRefrac,aRay.depth -1);
 
             return newRay;
         }
