@@ -1,6 +1,9 @@
 # Object files
 *.o
 
+# Output file
+output.ppm
+
 # Executable
 ray-tracer
 
