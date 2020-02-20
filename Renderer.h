@@ -265,35 +265,11 @@ namespace rt {
         }
 
         Ray refractionRay( const Ray& aRay, const Point3& p, Vector3 N, const Material& m ){
-            Real tmp;
-            Real r = m.in_refractive_index / m.out_refractive_index;
-            Real c  = (-1.0f) * N.dot(aRay.direction);
-
-            //When the ray is inside the object and go out
-            if(aRay.direction.dot(N) <= 0 ) {
-                r = 1.0f /r;
-            }
-            if(c>0)
-                tmp = r*c - sqrt(1 - ( (r*r) * (1 - (c*c) )));
-            else {
-                tmp = r * c + sqrt(1 - ((r * r) * (1 - (c * c))));
-            }
-
-            Vector3 vRefrac = Vector3(r*aRay.direction + tmp * N);
-
-            //Total reflexion
-            if( 1 - ( (r*r) * (1 - (c*c) )) < 0) {
-                vRefrac = RayUtils::reflect(aRay.direction, N);
-            }
-
-            Ray newRay = Ray(p + vRefrac * EPSILON,vRefrac,aRay.depth -1);
-
-            return newRay;
+            Vector3 vRefrac = RayUtils::vRefract(aRay, N, m);
+            return Ray(p + vRefrac * EPSILON, vRefrac, aRay.depth - 1);
         }
 
     };
-
-
 
 } // namespace rt
 
