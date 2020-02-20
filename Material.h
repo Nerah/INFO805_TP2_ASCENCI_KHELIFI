@@ -103,8 +103,7 @@ namespace rt {
             m.ambient   = Color( 0.1125, 0.0675, 0.054 );
             m.diffuse   = Color( 0.714, 0.4284, 0.18144 );
             m.specular  = Color( 0.9, 0.8, 0.7 );
-            // m.specular  = Color( 0.393548, 0.271906, 0.166721 );
-            m.shinyness = 56; // 25.6;
+            m.shinyness = 56;
             m.coef_diffusion  = 0.5f;
             m.coef_reflexion  = 0.75f;
             m.coef_refraction = 0.0f;
@@ -115,10 +114,10 @@ namespace rt {
         static Material emerald()
         {
             Material m;
-            m.ambient   = Color( 0.0f, 0.01f, 0.0f ); //Color( 0.0215, 0.1745, 0.0215 );
+            m.ambient   = Color( 0.0f, 0.01f, 0.0f );
             m.diffuse   = Color( 0.09568, 0.77424, 0.10 );
-            m.specular  = Color( 0.9, 1.0, 0.9 ); // Color( 0.633, 0.727811, 0.633 );
-            m.shinyness = 0.6*128.0;
+            m.specular  = Color( 0.9, 1.0, 0.9 );
+            m.shinyness = 0.6 * 128.0;
             m.coef_diffusion  = 0.15f;
             m.coef_reflexion  = 0.5f;
             m.coef_refraction = 0.65f;
@@ -129,18 +128,18 @@ namespace rt {
         static Material glass()
         {
             Material m;
-            m.ambient   = Color( 0.0, 0.0, 0.0 );
-            m.diffuse   = Color( 0.95, 0.95, 1.0 );
-            m.specular  = Color( 1.0, 1.0, 1.0 );
-            m.shinyness = 80.0f;
-            m.coef_diffusion  = 0.01f;
-            m.coef_reflexion  = 0.05f;
-            m.coef_refraction = 0.98f;
-            m.in_refractive_index  = 1.5f;
+            m.ambient   = Color( 0.1125, 0.0675, 0.054 );
+            m.diffuse   = Color( 0.714, 0.4284, 0.18144 );
+            m.specular  = Color( 0.9, 0.8, 0.7 );
+            m.shinyness = 56;
+            m.coef_diffusion  = 0.5f;
+            m.coef_reflexion  = 0.75f;
+            m.coef_refraction = 0.0f;
+            m.in_refractive_index  = 1.0f;
             m.out_refractive_index = 1.0f;
             return m;
         }
-        static Material darkMatter()
+        static Material blackMatter()
         {
             Material m;
             m.ambient   = Color( 0, 0.0, 0);
@@ -152,21 +151,6 @@ namespace rt {
             m.coef_refraction = 0.00f;
             m.in_refractive_index  = 0.0f;
             m.out_refractive_index = 0.0f;
-            return m;
-        }
-
-        static Material blueWater()
-        {
-            Material m;
-            m.ambient   = Color( 0.76, 0.93, 0.96);
-            m.diffuse   = Color( 0.29, 0.86, 0.95 );
-            m.specular  = Color( 1.0, 1.0, 1.0 );
-            m.shinyness = 90.0f;
-            m.coef_diffusion  = 0.01f;
-            m.coef_reflexion  = 0.4f;
-            m.coef_refraction = 0.9f;
-            m.in_refractive_index  = 1.3f;
-            m.out_refractive_index = 1.0f;
             return m;
         }
     };

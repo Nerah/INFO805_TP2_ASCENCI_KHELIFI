@@ -27,7 +27,7 @@ namespace rt {
         }
     };
     struct MathUtils {
-        static float randFloat(float a, float b){
+        static float randFloat(float a, float b) {
             return ((b - a ) * ((float) rand() / RAND_MAX)) + a;
         }
     };

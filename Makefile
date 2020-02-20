@@ -123,8 +123,7 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		Image2DWriter.h \
 		Renderer.h \
 		Ray.h \
-		PeriodicPlane.hpp \
-		Wave.hpp Viewer.cpp \
+		PeriodicPlane.hpp Viewer.cpp \
 		ray-tracer.cpp \
 		Sphere.cpp
 QMAKE_TARGET  = ray-tracer
@@ -300,7 +299,7 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents Viewer.h PointVector.h Color.h Sphere.h GraphicalObject.h Light.h Material.h PointLight.h Image2D.h Image2DWriter.h Renderer.h Ray.h PeriodicPlane.hpp Wave.hpp $(DISTDIR)/
+	$(COPY_FILE) --parents Viewer.h PointVector.h Color.h Sphere.h GraphicalObject.h Light.h Material.h PointLight.h Image2D.h Image2DWriter.h Renderer.h Ray.h PeriodicPlane.hpp $(DISTDIR)/
 	$(COPY_FILE) --parents Viewer.cpp ray-tracer.cpp Sphere.cpp $(DISTDIR)/
 
 
@@ -350,6 +349,8 @@ Viewer.o: Viewer.cpp Viewer.h \
 		Light.h \
 		Renderer.h \
 		Image2D.h \
+		Background.h \
+		Utils.h \
 		Image2DWriter.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Viewer.o Viewer.cpp
 
@@ -363,9 +364,7 @@ ray-tracer.o: ray-tracer.cpp Viewer.h \
 		Light.h \
 		Sphere.h \
 		PointLight.h \
-		PeriodicPlane.hpp \
-		WaterPlane.hpp \
-		Wave.hpp
+		PeriodicPlane.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ray-tracer.o ray-tracer.cpp
 
 Sphere.o: Sphere.cpp Sphere.h \
