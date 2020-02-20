@@ -41,9 +41,7 @@ int main(int argc, char** argv)
     Scene scene;
 
     // Light at infinity
-    addLight(scene, GL_LIGHT0, Point4( 0, 8, 30, 1 ), Color( 1.0, 0.8, 0.8 ));
-    addLight(scene, GL_LIGHT2, Point4( 15, 8, 30, 1 ), Color( 1.0, 0.8, 0.8 ));
-    addLight(scene, GL_LIGHT3, Point4( 30, 8, 30, 1 ), Color( 1.0, 0.8, 0.8 ));
+    addLight(scene, GL_LIGHT1, Point4( 30, 15, 30, 1 ), Color( 1.0, 0.8, 0.8 ));
 
     // Objects
     addBubble(scene, Point3( 3, 9, 2 ), 2.0, Material::bronze());
