@@ -244,21 +244,22 @@ namespace rt {
         /// retourne du noir, et enfin si les objets traversés sont
         /// transparents, attenue la couleur.
         Color shadow( const Ray& ray, Color light_color ){
-            GraphicalObject* obj_i = 0; // pointer to intersected object
-            Point3           p_i;       // point of intersection
-            Point3 newP =  ray.origin;
-            while(light_color.max() > 0.003f){
-                newP =  newP + ray.direction * EPSILON; // on decale le point p;
-                // Look for intersection in this direction.
-                Ray newRay = Ray(newP,ray.direction,ray.depth);
-                Real ri = ptrScene->rayIntersection( newRay, obj_i, p_i );
-                if ( ri >= 0.0f ){
-                    break;
-                }
-                Material m = obj_i->getMaterial(p_i);
-                light_color = light_color * m.diffuse * m.coef_refraction;
-                newP = p_i;
+            GraphicalObject* obj_i = 0;
+            Point3 p_i, newP =  ray.origin;
+            Material m;
+            Ray newRay;
+            Real ri;
 
+            while(light_color.max() > 0.003f){
+                newP += ray.direction * EPSILON;
+                newRay = Ray(newP, ray.direction, ray.depth);
+                ri = ptrScene->rayIntersection(newRay, obj_i, p_i);
+
+                if (ri >= 0.0f) return light_color;
+
+                m = obj_i->getMaterial(p_i);
+                light_color *= m.diffuse * m.coef_refraction;
+                newP = p_i;
             }
             return light_color;
         }
